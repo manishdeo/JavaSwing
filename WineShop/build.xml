@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="wineshop" default="build_all" basedir=".">
+	<property file="build.properties" />
+	<record name="${BUILD_LOG_FILE}" action="start" />
+	<path id="app.lib.dir">
+		<fileset dir="lib" includes="*.jar" />
+	</path>
+	<target name="build_all" depends="clean, copy_resources,create_manifest, compile, build_jar, copy_libs, copy_config, run" />
+	<target name="compile">
+		<mkdir dir="${BUILD_DIR}" />
+		<javac srcdir="${SRC_DIR}" 
+			destdir="${BUILD_DIR}"
+			debug="true"
+			excludes="**/junit/**/*">
+			<classpath refid="app.lib.dir" />
+		</javac>
+	</target>
+	<target name="create_manifest">
+		<mkdir dir="${BUILD_DIR}/META-INF" />
+		<manifest file="${BUILD_DIR}/META-INF/MANIFEST.MF">
+			<attribute name="Main-class" value="com.wine.shop.WineLaunch" />
+			<attribute name="Class-Path" value="lib/log4j-1.2.14.jar lib/mysql-connector-java-5.0.4-bin.jar" />
+		</manifest>
+	</target>
+	<target name="build_jar">
+		<mkdir dir="${DIST_DIR}" />
+		<jar destFile="${DIST_DIR}/wineshop.jar" manifest="${BUILD_DIR}/META-INF/MANIFEST.MF">
+			<fileset dir="${BUILD_DIR}" />
+		</jar>
+	</target>
+	<target name="copy_resources">
+		<copy toDir="${BUILD_DIR}">
+			<fileset dir="${SRC_DIR}"
+				includes="**/*.properties,
+				**/*.xml
+				**/*.gif
+				**/*.jpeg
+				**/*.jpg
+				**/*.tif
+				**/*.ico
+				**/*.bmp
+				**/*.png"
+			/>
+		</copy>		
+	</target>
+	<target name="run">
+			<java jar="${DIST_DIR}/wineshop.jar" fork="true" />
+		</target>
+	
+	<target name="copy_libs">
+		<copy toDir="${DIST_DIR}/lib">
+			<fileset dir="lib"/>
+		</copy>
+	</target>
+	<target name="copy_config">
+		<copy toDir="${DIST_DIR}">
+			<fileset dir="config"/>
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete dir="${BUILD_DIR}" />
+		<delete dir="${REPORT_DIR}" />		
+	</target>
+	<target name="wipe" depends="clean">
+		<delete dir="${DIST_DIR}"/>
+	</target>
+	
+</project>
+
